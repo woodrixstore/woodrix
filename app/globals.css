@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --transition-default: 0.3s ease;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  h1, h2, h3, h4, h5 {
+    @apply font-serif tracking-tight;
+  }
+  ::selection {
+    background: #A0622A;
+    color: #FAF7F2;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-sm bg-walnut px-6 py-3 text-sm font-medium text-background transition hover:bg-amber disabled:opacity-60 disabled:pointer-events-none;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-sm border border-walnut/40 bg-transparent px-6 py-3 text-sm font-medium text-walnut transition hover:bg-walnut hover:text-background;
+  }
+  .input-base {
+    @apply w-full bg-transparent border-0 border-b border-walnut/25 px-1 py-2.5 text-espresso placeholder:text-warmgrey/70 focus:outline-none focus:border-amber transition;
+  }
+  .small-caps {
+    font-feature-settings: "smcp" on;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+  .skeleton {
+    @apply animate-shimmer rounded-sm;
+    background: linear-gradient(
+      90deg,
+      #F2EDE4 0%,
+      #FAF7F2 50%,
+      #F2EDE4 100%
+    );
+    background-size: 1000px 100%;
+  }
+}
+
+/* Subtle warm wood grain overlay */
+.grain-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("/textures/grain-overlay.svg");
+  background-size: 240px;
+  mix-blend-mode: multiply;
+}
