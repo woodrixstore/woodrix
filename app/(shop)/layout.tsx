@@ -8,7 +8,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
     <>
       <AnnouncementBar />
       <Navbar />
-      <main>{children}</main>
+      <main className="pt-[76px]">{children}</main>
       <Footer />
       <CartDrawer />
     </>

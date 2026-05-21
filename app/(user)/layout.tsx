@@ -15,7 +15,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <Navbar />
-      <div className="container py-12">
+      <div className="container pt-[76px] pb-12">
         <div className="grid lg:grid-cols-[220px_1fr] gap-12">
           <aside className="lg:sticky lg:top-24 self-start">
             <h2 className="font-serif text-2xl text-espresso mb-6">My Account</h2>

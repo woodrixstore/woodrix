@@ -37,15 +37,19 @@ export default async function ShopPage({ searchParams }: { searchParams: SP }) {
   const dbProducts = await prisma.product.findMany({ where, orderBy }).catch(() => []);
 
   // Use demo products as fallback when database is empty
+  const now = new Date();
   const displayProducts = dbProducts.length > 0 ? dbProducts : DEMO_PRODUCTS.map((p) => ({
     id: p.id,
     name: p.name,
     slug: p.slug,
+    description: p.description,
     category: p.category,
     basePrice: p.basePrice,
     images: p.images,
     totalStock: p.totalStock,
     isFeatured: p.isFeatured,
+    createdAt: now,
+    updatedAt: now,
   }));
 
   return (

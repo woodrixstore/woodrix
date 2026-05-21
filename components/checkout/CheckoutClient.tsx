@@ -3,21 +3,43 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 import { useCart } from "@/hooks/useCart";
 import { formatPKR } from "@/lib/formatters";
 import { SHIPPING } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { StripePaymentForm } from "./StripePaymentForm";
 
-const BANK_INFO = `Bank Name: Meezan Bank
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null;
+
+const JAZZCASH_INFO = `JazzCash Account: 0312-1640167
 Account Title: WOODRIX
-Account Number: 9110011234567
-IBAN: PK31MEZN0099110011234567
 
-Please make a 30% advance payment to confirm your order.
-Send payment screenshot to WhatsApp: +92-300-1234567
-"You will be reverted back between 11AM–12PM"`;
+Transfer the full order amount and send the payment screenshot to:
+WhatsApp: 0339-0065105
 
-type PaymentMethod = "cod" | "bank";
+Your order will be confirmed within 2–3 hours after payment verification.`;
+
+const BANK_INFO = `Bank: Meezan Bank
+Account Title: NASAR ABBAS
+Account No: 01770107572179
+IBAN: PK88MEZN0001770107572179
+Branch: BL1G ULIS-E-JOHAR, KHI
+
+Transfer the full order amount and send the payment screenshot to:
+WhatsApp: 0339-0065105
+
+Your order will be confirmed within 2–3 hours after payment verification.`;
+
+const COD_INFO = `Pay in cash when your order arrives at your doorstep.
+No advance payment required.
+
+Our team will contact you on: 0339-0065105 before delivery.`;
+
+type PaymentMethod = "cod" | "jazzcash" | "bank" | "debit";
 
 export function CheckoutClient() {
   const router = useRouter();
@@ -31,16 +53,15 @@ export function CheckoutClient() {
     address: "", apt: "",
     city: "", postalCode: "",
     phone: "",
-    saveInfo: false,
-    textOffers: false,
   });
   const [payment, setPayment] = useState<PaymentMethod>("cod");
   const [billingSame, setBillingSame] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [stripeData, setStripeData] = useState<{ clientSecret: string; orderId: string } | null>(null);
 
   const shippingCost = useMemo(
-    () => subtotal >= SHIPPING.freeThreshold ? 0 : SHIPPING.standardCost,
-    [subtotal]
+    () => (subtotal >= SHIPPING.freeThreshold ? 0 : SHIPPING.standardCost),
+    [subtotal],
   );
   const total = subtotal + shippingCost;
 
@@ -63,10 +84,82 @@ export function CheckoutClient() {
       return;
     }
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 1200));
-    clearCart();
-    router.push("/order/success?demo=1");
-    setSubmitting(false);
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contact: {
+            name: `${form.firstName} ${form.lastName}`.trim(),
+            email: form.email,
+            phone: form.phone,
+          },
+          shipping: {
+            address: form.address,
+            apt: form.apt || undefined,
+            city: form.city,
+            postalCode: form.postalCode || undefined,
+            country: "Pakistan",
+          },
+          items: items.map((item) => ({
+            productId: item.productId,
+            variantId: item.variantId ?? null,
+            quantity: item.quantity,
+            price: item.price,
+            name: item.name,
+            variantDetails: { size: item.size, finish: item.finish },
+          })),
+          paymentMethod: payment,
+        }),
+      });
+
+      if (!res.ok) {
+        toast.error("Failed to place order. Please try again.");
+        setSubmitting(false);
+        return;
+      }
+
+      const data = await res.json();
+
+      if (payment === "debit" && data.clientSecret) {
+        setStripeData({ clientSecret: data.clientSecret, orderId: data.orderId });
+        setSubmitting(false);
+        return;
+      }
+
+      clearCart();
+      router.push(`/order/success?orderId=${data.orderId}`);
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+      setSubmitting(false);
+    }
+  }
+
+  if (stripeData && stripePromise) {
+    return (
+      <div className="bg-background min-h-screen flex items-center justify-center p-8">
+        <div className="max-w-lg w-full">
+          <div className="text-center mb-8">
+            <h2 className="font-display text-[26px] text-espresso font-bold mb-2">Complete Payment</h2>
+            <p className="text-warmgrey text-[14px]">
+              Order #{stripeData.orderId.slice(0, 8).toUpperCase()} · {formatPKR(total)}
+            </p>
+          </div>
+          <div className="bg-card border border-sand rounded-xl p-8">
+            <Elements stripe={stripePromise} options={{ clientSecret: stripeData.clientSecret }}>
+              <StripePaymentForm orderId={stripeData.orderId} />
+            </Elements>
+          </div>
+          <button
+            type="button"
+            className="mt-4 w-full text-[13px] text-warmgrey hover:text-espresso text-center transition"
+            onClick={() => setStripeData(null)}
+          >
+            ← Go back and change payment method
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -79,9 +172,8 @@ export function CheckoutClient() {
 
             {/* Contact */}
             <section>
-              <div className="flex items-center justify-between mb-5">
+              <div className="mb-5">
                 <h2 className="font-display text-[22px] text-espresso font-bold">Contact</h2>
-                <a href="/login" className="text-[12px] text-amber hover:underline">Sign in</a>
               </div>
               <div className="space-y-3">
                 <input {...field("email")} type="email" placeholder="Email" required
@@ -100,7 +192,6 @@ export function CheckoutClient() {
               <div className="space-y-3">
                 <div className="w-full border border-walnut/20 rounded-lg px-4 py-3 text-[14px] text-espresso bg-surface flex justify-between items-center">
                   <span>Pakistan</span>
-                  <svg className="h-4 w-4 text-warmgrey" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <input {...field("firstName")} placeholder="First name" required
@@ -120,18 +211,6 @@ export function CheckoutClient() {
                 </div>
                 <input {...field("phone")} type="tel" placeholder="Phone" required
                   className="w-full border border-walnut/20 rounded-lg px-4 py-3 text-[14px] text-espresso placeholder:text-warmgrey/60 focus:outline-none focus:border-walnut bg-background" />
-                <div className="space-y-2 pt-1">
-                  <label className="flex items-center gap-2 text-[13px] text-warmgrey cursor-pointer">
-                    <input type="checkbox" checked={form.saveInfo} onChange={(e) => setForm(f => ({ ...f, saveInfo: e.target.checked }))}
-                      className="rounded border-walnut/30 text-walnut" />
-                    Save this information for next time
-                  </label>
-                  <label className="flex items-center gap-2 text-[13px] text-warmgrey cursor-pointer">
-                    <input type="checkbox" checked={form.textOffers} onChange={(e) => setForm(f => ({ ...f, textOffers: e.target.checked }))}
-                      className="rounded border-walnut/30 text-walnut" />
-                    Text me with news and offers
-                  </label>
-                </div>
               </div>
             </section>
 
@@ -156,43 +235,37 @@ export function CheckoutClient() {
               <h2 className="font-display text-[22px] text-espresso font-bold mb-2">Payment</h2>
               <p className="text-[12px] text-emerald-700 mb-4">All transactions are secure and encrypted.</p>
               <div className="space-y-3">
-                {/* COD */}
-                <div
-                  className={cn("border rounded-lg overflow-hidden transition-all", payment === "cod" ? "border-walnut" : "border-walnut/20")}
-                >
-                  <button type="button" onClick={() => setPayment("cod")}
-                    className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-surface/50 transition">
-                    <div className={cn("h-4 w-4 rounded-full border-2 shrink-0 flex items-center justify-center transition",
-                      payment === "cod" ? "border-walnut" : "border-walnut/30")}>
-                      {payment === "cod" && <div className="h-2 w-2 rounded-full bg-walnut" />}
-                    </div>
-                    <span className="text-[14px] font-medium text-espresso">Cash on Delivery (COD)</span>
-                  </button>
+                <PaymentOption active={payment === "cod"} onClick={() => setPayment("cod")} label="Cash on Delivery">
                   {payment === "cod" && (
                     <div className="px-5 pb-5 pt-2 text-[13px] text-warmgrey leading-relaxed bg-surface/40 border-t border-walnut/10 whitespace-pre-line">
-                      {BANK_INFO}
+                      {COD_INFO}
                     </div>
                   )}
-                </div>
+                </PaymentOption>
 
-                {/* Bank Deposit */}
-                <div
-                  className={cn("border rounded-lg overflow-hidden transition-all", payment === "bank" ? "border-walnut" : "border-walnut/20")}
-                >
-                  <button type="button" onClick={() => setPayment("bank")}
-                    className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-surface/50 transition">
-                    <div className={cn("h-4 w-4 rounded-full border-2 shrink-0 flex items-center justify-center transition",
-                      payment === "bank" ? "border-walnut" : "border-walnut/30")}>
-                      {payment === "bank" && <div className="h-2 w-2 rounded-full bg-walnut" />}
+                <PaymentOption active={payment === "jazzcash"} onClick={() => setPayment("jazzcash")} label="JazzCash" badge="�">
+                  {payment === "jazzcash" && (
+                    <div className="px-5 pb-5 pt-2 text-[13px] text-warmgrey leading-relaxed bg-surface/40 border-t border-walnut/10 whitespace-pre-line">
+                      {JAZZCASH_INFO}
                     </div>
-                    <span className="text-[14px] font-medium text-espresso">Bank Deposit</span>
-                  </button>
+                  )}
+                </PaymentOption>
+
+                <PaymentOption active={payment === "bank"} onClick={() => setPayment("bank")} label="Bank Transfer (Meezan Bank)" badge="🏦">
                   {payment === "bank" && (
                     <div className="px-5 pb-5 pt-2 text-[13px] text-warmgrey leading-relaxed bg-surface/40 border-t border-walnut/10 whitespace-pre-line">
                       {BANK_INFO}
                     </div>
                   )}
-                </div>
+                </PaymentOption>
+
+                <PaymentOption active={payment === "debit"} onClick={() => setPayment("debit")} label="Debit / Credit Card" badge="💳">
+                  {payment === "debit" && (
+                    <div className="px-5 pb-4 pt-2 text-[13px] text-warmgrey bg-surface/40 border-t border-walnut/10">
+                      Card details will be entered on the next step. Powered by Stripe — all payments are encrypted.
+                    </div>
+                  )}
+                </PaymentOption>
               </div>
             </section>
 
@@ -226,7 +299,11 @@ export function CheckoutClient() {
               disabled={submitting}
               className="w-full bg-espresso text-background py-4 rounded-xl text-[15px] font-medium tracking-wide hover:bg-walnut transition-colors duration-300 disabled:opacity-60"
             >
-              {submitting ? "Placing order…" : "Complete order"}
+              {submitting
+                ? "Placing order…"
+                : payment === "debit"
+                  ? "Continue to Payment →"
+                  : "Complete Order"}
             </button>
           </div>
 
@@ -275,6 +352,38 @@ export function CheckoutClient() {
           </aside>
         </div>
       </form>
+    </div>
+  );
+}
+
+function PaymentOption({
+  active,
+  onClick,
+  label,
+  badge,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  badge?: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className={cn("border rounded-lg overflow-hidden transition-all", active ? "border-walnut" : "border-walnut/20")}>
+      <button
+        type="button"
+        onClick={onClick}
+        className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-surface/50 transition"
+      >
+        <div className={cn("h-4 w-4 rounded-full border-2 shrink-0 flex items-center justify-center transition",
+          active ? "border-walnut" : "border-walnut/30")}>
+          {active && <div className="h-2 w-2 rounded-full bg-walnut" />}
+        </div>
+        <span className="text-[14px] font-medium text-espresso">{label}</span>
+        {badge && <span className="ml-auto text-base">{badge}</span>}
+      </button>
+      {children}
     </div>
   );
 }

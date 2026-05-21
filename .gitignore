@@ -11,3 +11,6 @@ coverage
 .vercel
 *.log
 .turbo
+
+# Local Netlify folder
+.netlify

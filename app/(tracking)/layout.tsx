@@ -6,7 +6,7 @@ export default function TrackingLayout({ children }: { children: React.ReactNode
   return (
     <>
       <Navbar />
-      <main>{children}</main>
+      <main className="pt-[76px]">{children}</main>
       <Footer />
       <CartDrawer />
     </>

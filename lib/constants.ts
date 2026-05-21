@@ -1,8 +1,8 @@
 export const BRAND = {
   name: "Woodrix",
   tagline: "Crafted for the way you live.",
-  email: "hello@woodrix.com",
-  whatsapp: "+923000000000",
+  email: "woodrix.store@gmail.com",
+  whatsapp: "+923390065105",
   instagram: "https://instagram.com/woodrix",
   facebook: "https://facebook.com/woodrix",
 };

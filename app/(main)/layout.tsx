@@ -8,7 +8,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     <div className="bg-background min-h-screen">
       <SmoothScroll />
       <Navbar />
-      <main>{children}</main>
+      <main className="pt-[76px]">{children}</main>
       <Footer />
       <CartDrawer />
     </div>

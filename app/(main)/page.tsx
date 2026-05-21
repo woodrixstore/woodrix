@@ -1,6 +1,5 @@
 export const revalidate = 60; // revalidate at most every 60 s
 import { HeroSection } from "@/components/home/HeroSection";
-import { CategoryReveal } from "@/components/home/CategoryReveal";
 import { BrandStoryScroll } from "@/components/home/BrandStoryScroll";
 import { FeaturedGrid, type FeaturedItem } from "@/components/home/FeaturedGrid";
 import { StatsCounter } from "@/components/home/StatsCounter";
@@ -9,17 +8,16 @@ import { prisma } from "@/lib/prisma";
 
 export default async function HomePage() {
   const products = await prisma.product
-    .findMany({ where: { isFeatured: true }, take: 4, orderBy: { createdAt: "desc" } })
+    .findMany({ take: 8, orderBy: { createdAt: "desc" } })
     .catch(() => []);
 
-  const items: FeaturedItem[] = products.map((p, i) => ({
+  const items: FeaturedItem[] = products.map((p) => ({
     id: p.id,
     name: p.name,
     slug: p.slug,
     price: p.basePrice,
     image: p.images[0] || "/placeholder.jpg",
     hoverImage: p.images[1],
-    badge: i === 0 ? "Best Seller" : i === 2 ? "Only 2 Left" : i === 1 ? undefined : "New Arrival",
   }));
 
   const reviewRows = await prisma.review
@@ -43,9 +41,8 @@ export default async function HomePage() {
   return (
     <>
       <HeroSection />
-      <CategoryReveal />
-      <BrandStoryScroll />
       <FeaturedGrid items={items.length ? items : undefined} />
+      <BrandStoryScroll />
       <StatsCounter />
       <ReviewsCarousel reviews={reviews} />
     </>

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
-import { resend, FROM_EMAIL } from "@/lib/resend";
+import { sendOrderEmails } from "@/app/api/orders/route";
 
 export const dynamic = "force-dynamic";
 
@@ -30,19 +30,10 @@ export async function POST(req: Request) {
         include: { items: { include: { product: true } } },
       });
 
-      // Send confirmation email
-      if (order.customerEmail) {
-        try {
-          await resend.emails.send({
-            from: FROM_EMAIL,
-            to: order.customerEmail,
-            subject: `Order Confirmed — #${order.id.slice(0, 8).toUpperCase()}`,
-            html: `<h1>Thank you, ${order.customerName || "friend"}!</h1>
-              <p>Your Woodrix order <strong>#${order.id.slice(0, 8).toUpperCase()}</strong> has been confirmed.</p>
-              <p>Total: PKR ${order.total.toLocaleString()}</p>`,
-          });
-        } catch {}
-      }
+      const shortId = order.id.slice(0, 8).toUpperCase();
+      const { estimatedDelivery } = await import("@/lib/formatters");
+      const eta = estimatedDelivery(order.shippingMethod, new Date(order.createdAt));
+      await sendOrderEmails(order, shortId, eta, "Debit / Credit Card").catch(() => {});
     }
   }
 

@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 
 export function HeroSection() {
   return (
-    <section className="relative w-full bg-background overflow-hidden" style={{ minHeight: "100svh" }}>
+    <section className="relative w-full bg-background overflow-hidden mt-[-76px]" style={{ minHeight: "100svh" }}>
       <div className="grid lg:grid-cols-2" style={{ minHeight: "100svh" }}>
 
         {/* ─── LEFT: cream background + text ─── */}
