@@ -126,13 +126,15 @@ export async function POST(req: Request) {
     emailItems,
   };
 
+  let emailStatus = "sent";
   try {
     await sendOrderEmails(emailOrder, shortId, eta, paymentLabel);
   } catch (emailErr) {
+    emailStatus = String(emailErr);
     console.error("[orders] Email send failed (non-fatal):", emailErr);
   }
 
-  return NextResponse.json({ orderId });
+  return NextResponse.json({ orderId, emailStatus });
 }
 
 type EmailItem = { name: string; quantity: number; priceAtPurchase: number };
@@ -276,18 +278,25 @@ export async function sendOrderEmails(
       </div>
     </div>`;
 
-  await Promise.allSettled([
-    resend.emails.send({
+  // Send customer confirmation
+  if (order.customerEmail) {
+    const r1 = await resend.emails.send({
       from: FROM_EMAIL,
-      to: order.customerEmail!,
+      to: order.customerEmail,
       subject: `Order Confirmed #${shortId} — Woodrix`,
       html: customerHtml,
-    }),
-    resend.emails.send({
-      from: FROM_EMAIL,
-      to: ADMIN_EMAIL,
-      subject: `New Order #${shortId} · PKR ${order.total.toLocaleString()}`,
-      html: adminHtml,
-    }),
-  ]);
+    });
+    if (r1.error) console.error("[email] Customer email error:", JSON.stringify(r1.error));
+    else console.log("[email] Customer email sent, id:", r1.data?.id);
+  }
+
+  // Send admin notification
+  const r2 = await resend.emails.send({
+    from: FROM_EMAIL,
+    to: ADMIN_EMAIL,
+    subject: `New Order #${shortId} · PKR ${order.total.toLocaleString()}`,
+    html: adminHtml,
+  });
+  if (r2.error) console.error("[email] Admin email error:", JSON.stringify(r2.error));
+  else console.log("[email] Admin email sent, id:", r2.data?.id);
 }
