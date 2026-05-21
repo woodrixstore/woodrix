@@ -6,12 +6,12 @@ import { ArrowRight } from "lucide-react";
 
 export function HeroSection() {
   return (
-    <section className="relative w-full bg-background overflow-hidden mt-[-76px]" style={{ minHeight: "100svh" }}>
-      <div className="grid lg:grid-cols-2" style={{ minHeight: "100svh" }}>
+    <section className="relative w-full bg-background overflow-hidden mt-[-76px] lg:min-h-screen">
+      <div className="grid lg:grid-cols-2 lg:min-h-screen">
 
         {/* ─── LEFT: cream background + text ─── */}
-        <div className="bg-background flex items-center order-2 lg:order-1">
-          <div className="w-full px-8 sm:px-12 lg:pl-16 xl:pl-24 lg:pr-10 pt-[96px] pb-14 lg:pt-[104px] lg:pb-16">
+        <div className="bg-background flex items-center order-1 lg:order-1">
+          <div className="w-full px-8 sm:px-12 lg:pl-16 xl:pl-24 lg:pr-10 pt-24 pb-10 lg:pt-[104px] lg:pb-16">
 
             <motion.p
               initial={{ opacity: 0, y: 12 }}
@@ -86,13 +86,12 @@ export function HeroSection() {
         </div>
 
         {/* ─── RIGHT: rounded contained image card ─── */}
-        <div className="relative order-1 lg:order-2 bg-background flex items-start pt-3 pr-3 pb-3">
+        <div className="relative order-2 lg:order-2 bg-background flex items-start lg:pt-3 lg:pr-3 lg:pb-3 px-4 pb-4 lg:px-0 lg:pb-0">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full overflow-hidden rounded-3xl"
-            style={{ height: "88vh", maxHeight: "820px" }}
+            className="relative w-full overflow-hidden rounded-2xl lg:rounded-3xl h-[58vw] lg:h-[88vh] max-h-[820px]"
           >
             <Image
               src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1400&q=85&auto=format&fit=crop"

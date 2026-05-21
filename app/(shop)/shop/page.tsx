@@ -60,7 +60,7 @@ export default async function ShopPage({ searchParams }: { searchParams: SP }) {
         <p className="text-muted-foreground mt-2">{displayProducts.length} pieces handcrafted with care</p>
       </div>
 
-      <div className="grid lg:grid-cols-[260px_1fr] gap-12">
+      <div className="lg:grid lg:grid-cols-[260px_1fr] lg:gap-12">
         <FilterSidebar />
         <div>
           <div className="flex items-center justify-between mb-6">
