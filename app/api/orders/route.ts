@@ -126,7 +126,11 @@ export async function POST(req: Request) {
     emailItems,
   };
 
-  await sendOrderEmails(emailOrder, shortId, eta, paymentLabel);
+  try {
+    await sendOrderEmails(emailOrder, shortId, eta, paymentLabel);
+  } catch (emailErr) {
+    console.error("[orders] Email send failed (non-fatal):", emailErr);
+  }
 
   return NextResponse.json({ orderId });
 }
