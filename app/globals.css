@@ -15,7 +15,7 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    overscroll-behavior-y: contain;
+    overflow-x: hidden;
   }
   /* Prevent horizontal overflow on mobile */
   * {
@@ -103,4 +103,11 @@
   button, a[role="button"], input[type="submit"] {
     min-height: 44px;
   }
+}
+
+/* Smooth scroll performance */
+.motion-section {
+  will-change: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }

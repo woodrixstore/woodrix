@@ -1,6 +1,5 @@
 "use client";
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 
 const LINES = [
   "Every Woodrix piece begins as a single board —",
@@ -12,42 +11,52 @@ const LINES = [
   "and the restraint that quiet luxury asks for.",
 ];
 
-function AnimatedLine({ line }: { line: string }) {
-  const ref = useRef<HTMLParagraphElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start 0.92", "start 0.4"],
-  });
-  const opacity = useTransform(scrollYProgress, [0, 1], [0.12, 1]);
-  const y = useTransform(scrollYProgress, [0, 1], [6, 0]);
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.08 },
+  },
+};
 
-  return (
-    <motion.p
-      ref={ref}
-      style={{ opacity, y }}
-      className="font-display text-[28px] sm:text-[42px] lg:text-[58px] leading-[1.2] tracking-tight text-espresso"
-    >
-      {line}
-    </motion.p>
-  );
-}
+const lineVariants = {
+  hidden: { opacity: 0.12, y: 8 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+  },
+};
 
 export function BrandStoryScroll() {
   return (
-    <section className="relative w-full py-28 lg:py-40 bg-background overflow-hidden">
+    <section className="relative w-full py-24 lg:py-36 bg-background overflow-hidden">
       <div className="container max-w-[1100px]">
-
-        <p className="text-[11px] uppercase tracking-[0.4em] text-warmgrey mb-12">
+        <motion.p
+          initial={{ opacity: 0, y: 6 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5 }}
+          className="text-[11px] uppercase tracking-[0.4em] text-warmgrey mb-10"
+        >
           The Workshop
-        </p>
+        </motion.p>
 
-        {/* Each line fades from muted→full as you scroll through it */}
-        <div>
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+        >
           {LINES.map((line, i) => (
-            <AnimatedLine key={i} line={line} />
+            <motion.p
+              key={i}
+              variants={lineVariants}
+              className="font-display text-[26px] sm:text-[40px] lg:text-[56px] leading-[1.25] tracking-tight text-espresso"
+            >
+              {line}
+            </motion.p>
           ))}
-        </div>
-
+        </motion.div>
       </div>
     </section>
   );
