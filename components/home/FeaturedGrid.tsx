@@ -110,19 +110,25 @@ export function FeaturedGrid({ items }: { items?: FeaturedItem[] }) {
         </div>
 
         {/* 4 × 2 grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-7">
-          {data.slice(0, 8).map((p, i) => (
+        <motion.div
+          className="grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-7"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06 } } }}
+        >
+          {data.slice(0, 8).map((p) => (
             <motion.div
               key={p.id}
-              initial={{ opacity: 0, y: 32 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              variants={{
+                hidden: { opacity: 0, y: 24 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+              }}
             >
               <ProductCard item={p} />
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* View all link */}
         <div className="text-center mt-12">
