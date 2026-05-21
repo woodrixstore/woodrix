@@ -9,6 +9,8 @@ export const dynamic = "force-dynamic";
 
 const ADMIN_EMAIL = "woodrix.store@gmail.com";
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const OrderBody = z.object({
   contact: z.object({
     name: z.string().min(2),
@@ -25,8 +27,8 @@ const OrderBody = z.object({
   items: z
     .array(
       z.object({
-        productId: z.string().uuid(),
-        variantId: z.string().uuid().nullish(),
+        productId: z.string().min(1),
+        variantId: z.string().nullish(),
         quantity: z.number().int().min(1),
         price: z.number().positive(),
         name: z.string(),
@@ -61,6 +63,9 @@ export async function POST(req: Request) {
 
   const total = Math.max(0, subtotal + shippingCost - discountAmount);
 
+  // Only link real DB products (valid UUIDs that exist); demo products skip FK relation
+  const realItems = items.filter((i) => UUID_RE.test(i.productId));
+
   const order = await prisma.order.create({
     data: {
       status: "pending",
@@ -73,17 +78,18 @@ export async function POST(req: Request) {
       customerEmail: contact.email,
       customerName: contact.name,
       customerPhone: contact.phone,
-      items: {
-        create: items.map((i) => ({
-          productId: i.productId,
-          variantId: i.variantId ?? null,
-          quantity: i.quantity,
-          priceAtPurchase: i.price,
-          variantDetails: (i.variantDetails ?? {}) as any,
-        })),
-      },
+      items: realItems.length > 0
+        ? {
+            create: realItems.map((i) => ({
+              productId: i.productId,
+              variantId: UUID_RE.test(i.variantId ?? "") ? (i.variantId ?? null) : null,
+              quantity: i.quantity,
+              priceAtPurchase: i.price,
+              variantDetails: (i.variantDetails ?? {}) as any,
+            })),
+          }
+        : undefined,
     },
-    include: { items: { include: { product: true } } },
   });
 
   const shortId = order.id.slice(0, 8).toUpperCase();
@@ -95,10 +101,24 @@ export async function POST(req: Request) {
         ? "JazzCash"
         : "Bank Transfer (Meezan Bank)";
 
-  await sendOrderEmails(order, shortId, eta, paymentLabel);
+  // Use request items for email (includes demo products with their names)
+  const emailItems = items.map((i) => ({
+    name: i.name,
+    quantity: i.quantity,
+    priceAtPurchase: i.price,
+  }));
+
+  await sendOrderEmails(
+    { ...order, emailItems },
+    shortId,
+    eta,
+    paymentLabel,
+  );
 
   return NextResponse.json({ orderId: order.id });
 }
+
+type EmailItem = { name: string; quantity: number; priceAtPurchase: number };
 
 type OrderWithItems = {
   id: string;
@@ -109,7 +129,7 @@ type OrderWithItems = {
   shippingCost: number;
   discountAmount: number;
   total: number;
-  items: Array<{ quantity: number; priceAtPurchase: number; product: { name: string } }>;
+  emailItems: EmailItem[];
 };
 
 export async function sendOrderEmails(
@@ -123,11 +143,11 @@ export async function sendOrderEmails(
     .filter(Boolean)
     .join(", ");
 
-  const itemsRows = order.items
+  const itemsRows = order.emailItems
     .map(
-      (it, i) => `
+      (it: EmailItem, i: number) => `
       <tr style="background:${i % 2 === 0 ? "#ffffff" : "#faf8f6"};">
-        <td style="padding:10px 14px;font-size:14px;color:#2c1810;">${it.product.name}</td>
+        <td style="padding:10px 14px;font-size:14px;color:#2c1810;">${it.name}</td>
         <td style="padding:10px 14px;font-size:14px;color:#2c1810;text-align:center;">${it.quantity}</td>
         <td style="padding:10px 14px;font-size:14px;color:#2c1810;text-align:right;">PKR ${(it.priceAtPurchase * it.quantity).toLocaleString()}</td>
       </tr>`,

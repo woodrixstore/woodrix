@@ -149,11 +149,11 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     description:
       "A wall-mounted floating laptop table — folds flat when not in use, unfolds into a clean, sturdy work surface in seconds. Perfect for home offices, study corners, or small apartments. Space-saving, handcrafted, built to last.",
     images: [
-      "/products/floating-laptop-table/laptop-table-1.jpeg",
-      "/products/floating-laptop-table/laptop-table-2.jpeg",
       "/products/floating-laptop-table/laptop-table-3.jpeg",
       "/products/floating-laptop-table/laptop-table-4.jpeg",
       "/products/floating-laptop-table/laptop-table-5.jpeg",
+      "/products/floating-laptop-table/laptop-table-1.jpeg",
+      "/products/floating-laptop-table/laptop-table-2.jpeg",
     ],
     totalStock: 12,
     isFeatured: true,

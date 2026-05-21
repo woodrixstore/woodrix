@@ -18,14 +18,12 @@ export type FeaturedItem = {
 };
 
 const FALLBACK: FeaturedItem[] = [
-  { id: "demo-1", name: "Walnut Serving Tray", slug: "walnut-serving-tray", price: 12500, image: "https://images.unsplash.com/photo-1581539250439-c96689b516dd?w=900&q=80&auto=format&fit=crop" },
-  { id: "demo-2", name: "Oak Floating Shelf", slug: "oak-floating-shelf", price: 9500, image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=900&q=80&auto=format&fit=crop" },
-  { id: "demo-3", name: "Teak Footrest Stool", slug: "teak-footrest-stool", price: 18500, image: "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=900&q=80&auto=format&fit=crop" },
-  { id: "demo-4", name: "Walnut Standing Mirror", slug: "walnut-standing-mirror", price: 32000, image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=900&q=80&auto=format&fit=crop" },
-  { id: "demo-5", name: "Mango Wood Bowl", slug: "mango-wood-bowl", price: 6500, image: "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=900&q=80&auto=format&fit=crop" },
-  { id: "demo-6", name: "Acacia Cheese Board", slug: "acacia-cheese-board", price: 8500, image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900&q=80&auto=format&fit=crop" },
-  { id: "demo-7", name: "Sheesham Bedside Table", slug: "sheesham-bedside-table", price: 22000, image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900&q=80&auto=format&fit=crop" },
-  { id: "demo-8", name: "Driftwood Wall Art", slug: "driftwood-wall-art", price: 14000, image: "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=900&q=80&auto=format&fit=crop" },
+  { id: "demo-1", name: "Wooden Serving Tray", slug: "wooden-serving-tray", price: 2500, image: "/products/wooden-tray/tray-1.png", badge: "Best Seller" },
+  { id: "demo-2", name: "Floating Mini Shelf", slug: "floating-mini-shelf", price: 1800, image: "/products/floating-mini-shelf/mini-shelf-1.jpg" },
+  { id: "demo-3", name: "Floating Book Shelf", slug: "floating-book-shelf", price: 3200, image: "/products/floating-book-shelf/book-shelf-1.png", badge: "New Arrival" },
+  { id: "demo-4", name: "Wooden Footrest", slug: "wooden-footrest", price: 3500, image: "/products/wooden-footrest/footrest-1.png" },
+  { id: "demo-5", name: "Wooden Key Holder", slug: "wooden-key-holder", price: 1200, image: "/products/wooden-key-holder/key-holder-1.png", badge: "Popular" },
+  { id: "demo-6", name: "Floating Laptop Table", slug: "floating-laptop-table", price: 4500, image: "/products/floating-laptop-table/laptop-table-3.jpeg", badge: "Space Saver" },
 ];
 
 function ProductCard({ item }: { item: FeaturedItem }) {
