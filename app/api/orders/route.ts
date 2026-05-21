@@ -63,37 +63,44 @@ export async function POST(req: Request) {
 
   const total = Math.max(0, subtotal + shippingCost - discountAmount);
 
-  // Only link real DB products (valid UUIDs that exist); demo products skip FK relation
-  const realItems = items.filter((i) => UUID_RE.test(i.productId));
+  // Pre-generate orderId so emails work even if DB is unavailable
+  const orderId = crypto.randomUUID();
 
-  const order = await prisma.order.create({
-    data: {
-      status: "pending",
-      total,
-      shippingAddress: shipping as any,
-      shippingMethod: "standard",
-      shippingCost,
-      couponCode: couponCode?.toUpperCase(),
-      discountAmount,
-      customerEmail: contact.email,
-      customerName: contact.name,
-      customerPhone: contact.phone,
-      items: realItems.length > 0
-        ? {
-            create: realItems.map((i) => ({
-              productId: i.productId,
-              variantId: UUID_RE.test(i.variantId ?? "") ? (i.variantId ?? null) : null,
-              quantity: i.quantity,
-              priceAtPurchase: i.price,
-              variantDetails: (i.variantDetails ?? {}) as any,
-            })),
-          }
-        : undefined,
-    },
-  });
+  // Try saving to DB — if it fails (no DB connection, etc.) orders still go through via email
+  try {
+    const realItems = items.filter((i) => UUID_RE.test(i.productId));
+    await prisma.order.create({
+      data: {
+        id: orderId,
+        status: "pending",
+        total,
+        shippingAddress: shipping as any,
+        shippingMethod: "standard",
+        shippingCost,
+        couponCode: couponCode?.toUpperCase(),
+        discountAmount,
+        customerEmail: contact.email,
+        customerName: contact.name,
+        customerPhone: contact.phone,
+        items: realItems.length > 0
+          ? {
+              create: realItems.map((i) => ({
+                productId: i.productId,
+                variantId: UUID_RE.test(i.variantId ?? "") ? (i.variantId ?? null) : null,
+                quantity: i.quantity,
+                priceAtPurchase: i.price,
+                variantDetails: (i.variantDetails ?? {}) as any,
+              })),
+            }
+          : undefined,
+      },
+    });
+  } catch (dbErr) {
+    console.error("[orders] DB save failed (non-fatal):", dbErr);
+  }
 
-  const shortId = order.id.slice(0, 8).toUpperCase();
-  const eta = estimatedDelivery("standard", new Date(order.createdAt));
+  const shortId = orderId.slice(0, 8).toUpperCase();
+  const eta = estimatedDelivery("standard", new Date());
   const paymentLabel =
     paymentMethod === "cod"
       ? "Cash on Delivery"
@@ -101,21 +108,27 @@ export async function POST(req: Request) {
         ? "JazzCash"
         : "Bank Transfer (Meezan Bank)";
 
-  // Use request items for email (includes demo products with their names)
   const emailItems = items.map((i) => ({
     name: i.name,
     quantity: i.quantity,
     priceAtPurchase: i.price,
   }));
 
-  await sendOrderEmails(
-    { ...order, emailItems },
-    shortId,
-    eta,
-    paymentLabel,
-  );
+  const emailOrder: OrderWithItems = {
+    id: orderId,
+    customerName: contact.name,
+    customerEmail: contact.email,
+    customerPhone: contact.phone,
+    shippingAddress: shipping,
+    shippingCost,
+    discountAmount,
+    total,
+    emailItems,
+  };
 
-  return NextResponse.json({ orderId: order.id });
+  await sendOrderEmails(emailOrder, shortId, eta, paymentLabel);
+
+  return NextResponse.json({ orderId });
 }
 
 type EmailItem = { name: string; quantity: number; priceAtPurchase: number };
