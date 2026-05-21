@@ -1,10 +1,51 @@
-export const revalidate = 60; // revalidate at most every 60 s
+export const revalidate = 60;
+import type { Metadata } from "next";
 import { HeroSection } from "@/components/home/HeroSection";
 import { BrandStoryScroll } from "@/components/home/BrandStoryScroll";
 import { FeaturedGrid, type FeaturedItem } from "@/components/home/FeaturedGrid";
 import { StatsCounter } from "@/components/home/StatsCounter";
 import { ReviewsCarousel } from "@/components/home/ReviewsCarousel";
 import { prisma } from "@/lib/prisma";
+
+export const metadata: Metadata = {
+  title: "Woodrix — Handcrafted Wooden Home Décor Pakistan",
+  description: "Woodrix — premium handcrafted wooden home décor made in Karachi, Pakistan. Shop wooden trays, floating shelves, footrests, key holders & laptop tables. Free delivery on orders above PKR 5,000.",
+  alternates: { canonical: "/" },
+};
+
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": ["Organization", "LocalBusiness"],
+  name: "Woodrix",
+  url: "https://woodrix.store",
+  logo: "https://woodrix.store/logo/woodrix-logo-dark.png",
+  description: "Premium handcrafted wooden home décor made in Karachi, Pakistan.",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "North Karachi",
+    addressRegion: "Sindh",
+    addressCountry: "PK",
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: "+92-339-0065105",
+    contactType: "customer service",
+    availableLanguage: ["en", "ur"],
+  },
+  sameAs: [],
+};
+
+const storeJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Woodrix",
+  url: "https://woodrix.store",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "https://woodrix.store/shop?q={search_term_string}",
+    "query-input": "required name=search_term_string",
+  },
+};
 
 export default async function HomePage() {
   const products = await prisma.product
@@ -40,6 +81,8 @@ export default async function HomePage() {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }} />
       <HeroSection />
       <FeaturedGrid items={items.length ? items : undefined} />
       <BrandStoryScroll />

@@ -30,20 +30,35 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://woodrix.store"),
   title: {
-    default: `${BRAND.name} — ${BRAND.tagline}`,
-    template: `%s · ${BRAND.name}`,
+    default: "Woodrix — Handcrafted Wooden Home Décor Pakistan",
+    template: `%s · Woodrix`,
   },
   description:
-    "Premium handcrafted wooden home décor — trays, shelves, mirrors, dressing tables and more. Built to last a lifetime.",
+    "Woodrix — premium handcrafted wooden home décor made in Karachi, Pakistan. Shop wooden trays, floating shelves, footrests, key holders, laptop tables & more. Built to last a lifetime.",
+  keywords: [
+    "woodrix", "wooden home decor pakistan", "handcrafted wood furniture karachi",
+    "floating shelves pakistan", "wooden tray pakistan", "wooden key holder",
+    "floating laptop table", "wooden footrest", "wood decor online pakistan",
+    "buy wooden furniture karachi", "handmade wood pakistan",
+  ],
   openGraph: {
-    title: `${BRAND.name} — ${BRAND.tagline}`,
-    description:
-      "Premium handcrafted wooden home décor — trays, shelves, mirrors, dressing tables and more.",
+    title: "Woodrix — Handcrafted Wooden Home Décor Pakistan",
+    description: "Premium handcrafted wooden home décor made in Karachi. Trays, shelves, footrests, key holders, laptop tables — built to last.",
     type: "website",
-    siteName: BRAND.name,
+    siteName: "Woodrix",
+    locale: "en_PK",
+    images: [{ url: "/logo/woodrix-logo-dark.png", width: 1200, height: 630, alt: "Woodrix — Handcrafted Wood" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Woodrix — Handcrafted Wooden Home Décor Pakistan",
+    description: "Premium handcrafted wooden home décor made in Karachi, Pakistan.",
     images: ["/logo/woodrix-logo-dark.png"],
+  },
+  alternates: {
+    canonical: "/",
   },
   icons: {
     icon: "/logo/favicon.ico",
@@ -56,9 +71,12 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: BRAND.name,
+    title: "Woodrix",
   },
   formatDetection: { telephone: false },
+  verification: {
+    google: "",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

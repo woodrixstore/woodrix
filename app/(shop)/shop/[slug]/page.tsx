@@ -16,10 +16,16 @@ import {
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const demo = getDemoProduct(params.slug);
-  if (demo) return { title: demo.name, description: demo.description.slice(0, 160) };
-  const p = await prisma.product.findUnique({ where: { slug: params.slug } }).catch(() => null);
-  if (!p) return {};
-  return { title: p.name, description: p.description.slice(0, 160) };
+  const name = demo?.name ?? (await prisma.product.findUnique({ where: { slug: params.slug } }).catch(() => null))?.name;
+  const description = demo?.description ?? "";
+  const image = demo?.images?.[0] ?? "";
+  if (!name) return {};
+  return {
+    title: `${name} — Handcrafted Wood | Woodrix Pakistan`,
+    description: description.slice(0, 160),
+    openGraph: { title: name, description: description.slice(0, 160), images: [image] },
+    alternates: { canonical: `/shop/${params.slug}` },
+  };
 }
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {
