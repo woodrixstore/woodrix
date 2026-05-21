@@ -50,6 +50,7 @@ export function CheckoutClient() {
   const [payment, setPayment] = useState<PaymentMethod>("cod");
   const [billingSame, setBillingSame] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const shippingCost = useMemo(
     () => (subtotal >= SHIPPING.freeThreshold ? 0 : SHIPPING.standardCost),
     [subtotal],
@@ -57,8 +58,8 @@ export function CheckoutClient() {
   const total = subtotal + shippingCost;
 
   useEffect(() => {
-    if (items.length === 0) router.replace("/shop");
-  }, [items.length, router]);
+    if (items.length === 0 && !submitted) router.replace("/shop");
+  }, [items.length, router, submitted]);
 
   function field(key: keyof typeof form) {
     return {
@@ -111,8 +112,9 @@ export function CheckoutClient() {
       }
 
       const data = await res.json();
-      clearCart();
+      setSubmitted(true);
       router.push(`/order/success?orderId=${data.orderId}`);
+      clearCart();
     } catch {
       toast.error("Something went wrong. Please try again.");
       setSubmitting(false);
