@@ -6,12 +6,25 @@
   :root {
     color-scheme: light;
     --transition-default: 0.3s ease;
+    --bottom-nav-height: 64px;
   }
   html {
     scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    overscroll-behavior-y: contain;
+  }
+  /* Prevent horizontal overflow on mobile */
+  * {
+    box-sizing: border-box;
+    min-width: 0;
+  }
+  img, video {
+    max-width: 100%;
+    height: auto;
   }
   h1, h2, h3, h4, h5 {
     @apply font-serif tracking-tight;
@@ -58,4 +71,36 @@
   background-image: url("/textures/grain-overlay.svg");
   background-size: 240px;
   mix-blend-mode: multiply;
+}
+
+/* PWA safe-area + bottom nav spacing */
+.pb-safe {
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+}
+
+/* Only apply bottom nav offset on small screens */
+@media (min-width: 560px) {
+  .pb-safe {
+    padding-bottom: 0;
+  }
+}
+
+/* Touch feedback for interactive elements */
+@media (hover: none) {
+  button:active, a:active {
+    opacity: 0.7;
+    transition: opacity 0.1s;
+  }
+}
+
+/* Mobile scroll improvements */
+@media (max-width: 559px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  /* Ensure minimum touch target size (44px) */
+  button, a[role="button"], input[type="submit"] {
+    min-height: 44px;
+  }
 }

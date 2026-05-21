@@ -3,17 +3,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
 import { useCart } from "@/hooks/useCart";
 import { formatPKR } from "@/lib/formatters";
 import { SHIPPING } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { StripePaymentForm } from "./StripePaymentForm";
-
-const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
-  : null;
 
 const JAZZCASH_INFO = `JazzCash Account: 0312-1640167
 Account Title: WOODRIX
@@ -39,7 +32,7 @@ No advance payment required.
 
 Our team will contact you on: 0339-0065105 before delivery.`;
 
-type PaymentMethod = "cod" | "jazzcash" | "bank" | "debit";
+type PaymentMethod = "cod" | "jazzcash" | "bank";
 
 export function CheckoutClient() {
   const router = useRouter();
@@ -57,8 +50,6 @@ export function CheckoutClient() {
   const [payment, setPayment] = useState<PaymentMethod>("cod");
   const [billingSame, setBillingSame] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [stripeData, setStripeData] = useState<{ clientSecret: string; orderId: string } | null>(null);
-
   const shippingCost = useMemo(
     () => (subtotal >= SHIPPING.freeThreshold ? 0 : SHIPPING.standardCost),
     [subtotal],
@@ -120,46 +111,12 @@ export function CheckoutClient() {
       }
 
       const data = await res.json();
-
-      if (payment === "debit" && data.clientSecret) {
-        setStripeData({ clientSecret: data.clientSecret, orderId: data.orderId });
-        setSubmitting(false);
-        return;
-      }
-
       clearCart();
       router.push(`/order/success?orderId=${data.orderId}`);
     } catch {
       toast.error("Something went wrong. Please try again.");
       setSubmitting(false);
     }
-  }
-
-  if (stripeData && stripePromise) {
-    return (
-      <div className="bg-background min-h-screen flex items-center justify-center p-8">
-        <div className="max-w-lg w-full">
-          <div className="text-center mb-8">
-            <h2 className="font-display text-[26px] text-espresso font-bold mb-2">Complete Payment</h2>
-            <p className="text-warmgrey text-[14px]">
-              Order #{stripeData.orderId.slice(0, 8).toUpperCase()} · {formatPKR(total)}
-            </p>
-          </div>
-          <div className="bg-card border border-sand rounded-xl p-8">
-            <Elements stripe={stripePromise} options={{ clientSecret: stripeData.clientSecret }}>
-              <StripePaymentForm orderId={stripeData.orderId} />
-            </Elements>
-          </div>
-          <button
-            type="button"
-            className="mt-4 w-full text-[13px] text-warmgrey hover:text-espresso text-center transition"
-            onClick={() => setStripeData(null)}
-          >
-            ← Go back and change payment method
-          </button>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -259,13 +216,6 @@ export function CheckoutClient() {
                   )}
                 </PaymentOption>
 
-                <PaymentOption active={payment === "debit"} onClick={() => setPayment("debit")} label="Debit / Credit Card" badge="💳">
-                  {payment === "debit" && (
-                    <div className="px-5 pb-4 pt-2 text-[13px] text-warmgrey bg-surface/40 border-t border-walnut/10">
-                      Card details will be entered on the next step. Powered by Stripe — all payments are encrypted.
-                    </div>
-                  )}
-                </PaymentOption>
               </div>
             </section>
 
@@ -299,11 +249,7 @@ export function CheckoutClient() {
               disabled={submitting}
               className="w-full bg-espresso text-background py-4 rounded-xl text-[15px] font-medium tracking-wide hover:bg-walnut transition-colors duration-300 disabled:opacity-60"
             >
-              {submitting
-                ? "Placing order…"
-                : payment === "debit"
-                  ? "Continue to Payment →"
-                  : "Complete Order"}
+              {submitting ? "Placing order…" : "Complete Order"}
             </button>
           </div>
 

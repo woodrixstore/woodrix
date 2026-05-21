@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { stripe } from "@/lib/stripe";
 import { resend, FROM_EMAIL } from "@/lib/resend";
 import { BRAND, SHIPPING } from "@/lib/constants";
 import { estimatedDelivery } from "@/lib/formatters";
@@ -35,7 +34,7 @@ const OrderBody = z.object({
       }),
     )
     .min(1),
-  paymentMethod: z.enum(["cod", "jazzcash", "bank", "debit"]),
+  paymentMethod: z.enum(["cod", "jazzcash", "bank"]),
   couponCode: z.string().optional(),
 });
 
@@ -94,30 +93,9 @@ export async function POST(req: Request) {
       ? "Cash on Delivery"
       : paymentMethod === "jazzcash"
         ? "JazzCash"
-        : paymentMethod === "bank"
-          ? "Bank Transfer (Meezan Bank)"
-          : "Debit / Credit Card";
+        : "Bank Transfer (Meezan Bank)";
 
-  if (paymentMethod !== "debit") {
-    await sendOrderEmails(order, shortId, eta, paymentLabel);
-  }
-
-  if (paymentMethod === "debit") {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(total * 100),
-      currency: "pkr",
-      metadata: { orderId: order.id },
-      receipt_email: contact.email,
-    });
-    await prisma.order.update({
-      where: { id: order.id },
-      data: { stripePaymentId: paymentIntent.id },
-    });
-    return NextResponse.json({
-      orderId: order.id,
-      clientSecret: paymentIntent.client_secret,
-    });
-  }
+  await sendOrderEmails(order, shortId, eta, paymentLabel);
 
   return NextResponse.json({ orderId: order.id });
 }
