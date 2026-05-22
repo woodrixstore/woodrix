@@ -1,9 +1,12 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { ShoppingCart } from "lucide-react";
 import { formatPKR } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/hooks/useCart";
 
 type Props = {
   id: string;
@@ -25,104 +28,94 @@ type Props = {
  * - "Add to Cart" slide-up from bottom
  * - Warm brown drop shadow that deepens on hover
  */
-export function ProductCard({ name, slug, price, image, hoverImage, badge, className }: Props) {
+export function ProductCard({ id, name, slug, price, image, hoverImage, badge, className }: Props) {
+  const addItem = useCart((s) => s.addItem);
+  const openCart = useCart((s) => s.open);
+  const router = useRouter();
   const ref = useRef<HTMLDivElement>(null);
-  const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
   const [hovered, setHovered] = useState(false);
 
-  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setTilt({ rx: -y * 3, ry: x * 3 });
+  const cartLine = {
+    id: `${id}-default`,
+    productId: id,
+    variantId: null,
+    name,
+    slug,
+    image,
+    price,
+    quantity: 1,
   };
-  const onLeave = () => {
-    setHovered(false);
-    setTilt({ rx: 0, ry: 0 });
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addItem(cartLine);
+    openCart();
+  };
+
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addItem(cartLine);
+    router.push("/checkout");
   };
 
   return (
-    <div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={onLeave}
-      data-cursor="view"
-      className={cn("group [perspective:1200px]", className)}
-    >
-      <div
-        className="relative will-change-transform transition-transform duration-300 ease-out"
-        style={{
-          transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translateY(${hovered ? -6 : 0}px)`,
-          boxShadow: hovered
-            ? "0 30px 60px -25px rgba(107,66,38,0.35), 0 12px 28px -16px rgba(107,66,38,0.25)"
-            : "0 6px 20px -12px rgba(107,66,38,0.18)",
-          borderRadius: 6,
-        }}
+    <div ref={ref} className={cn("group flex flex-col", className)}>
+      {/* Image */}
+      <Link
+        href={`/shop/${slug}`}
+        className="relative aspect-square lg:aspect-[4/5] bg-surface rounded-xl lg:rounded-2xl overflow-hidden mb-2"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
       >
-        <Link href={`/shop/${slug}`} className="block">
-          {/* Image — portrait 4:5 */}
-          <div className="relative aspect-[4/5] overflow-hidden rounded-t-md bg-surface">
-            <Image
-              src={image}
-              alt={name}
-              fill
-              sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
-              className={cn(
-                "object-cover transition-all duration-700 ease-out",
-                hovered ? "scale-[1.05]" : "scale-100",
-                hovered && hoverImage ? "opacity-0" : "opacity-100"
-              )}
-            />
-            {hoverImage && (
-              <Image
-                src={hoverImage}
-                alt=""
-                fill
-                sizes="(min-width: 1024px) 25vw, 50vw"
-                className={cn(
-                  "object-cover transition-opacity duration-700 ease-out",
-                  hovered ? "opacity-100 scale-[1.05]" : "opacity-0 scale-100"
-                )}
-              />
+        <Image
+          src={image}
+          alt={name}
+          fill
+          sizes="(min-width: 1024px) 33vw, 33vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+        {hoverImage && (
+          <Image
+            src={hoverImage}
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 33vw, 33vw"
+            className={cn(
+              "object-cover transition-opacity duration-500 absolute inset-0",
+              hovered ? "opacity-100" : "opacity-0"
             )}
-
-            {/* Badge */}
-            {badge && (
-              <div className="absolute top-3 left-3 bg-background/95 backdrop-blur text-walnut text-[9px] uppercase tracking-[0.28em] font-medium px-2.5 py-1.5 rounded-sm leading-none">
-                {badge}
-              </div>
-            )}
-
-            {/* Slide-up "Add to Cart" bar */}
-            <div
-              className={cn(
-                "absolute inset-x-3 bottom-3 transition-all duration-500 ease-out",
-                hovered ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0 pointer-events-none"
-              )}
-            >
-              <div
-                data-cursor="add"
-                className="w-full bg-walnut text-background text-[10px] uppercase tracking-[0.3em] font-medium py-3 rounded-sm text-center hover:bg-amber transition-colors"
-              >
-                Add to Cart
-              </div>
-            </div>
+          />
+        )}
+        {badge && (
+          <div className="absolute top-2 left-2 bg-background/95 backdrop-blur text-walnut text-[8px] lg:text-[9px] uppercase tracking-widest font-medium px-2 py-1 rounded-sm leading-none">
+            {badge}
           </div>
+        )}
+      </Link>
 
-          {/* Meta */}
-          <div className="bg-background px-1.5 pt-4 pb-2 flex items-baseline justify-between gap-3">
-            <h3 className="font-display text-[20px] leading-tight text-espresso tracking-tight">
-              {name}
-            </h3>
-            <p className="text-[13px] text-warmgrey font-medium tabular-nums whitespace-nowrap">
-              {formatPKR(price)}
-            </p>
-          </div>
-        </Link>
-      </div>
+      {/* Add to Cart */}
+      <button
+        onClick={handleAddToCart}
+        className="w-full flex items-center justify-center gap-1.5 py-2 lg:py-3 border border-espresso/70 text-espresso text-[9px] lg:text-[12px] font-bold uppercase tracking-[0.08em] lg:tracking-[0.15em] rounded-lg lg:rounded-xl hover:bg-espresso hover:text-background transition-colors duration-200 mb-1.5"
+      >
+        <ShoppingCart className="h-3 w-3 lg:h-4 lg:w-4 shrink-0" />
+        <span className="hidden sm:inline">Add to Cart</span>
+        <span className="sm:hidden">Cart</span>
+      </button>
+
+      {/* Buy Now */}
+      <button
+        onClick={handleBuyNow}
+        className="w-full py-2 lg:py-3 bg-walnut text-background text-[9px] lg:text-[12px] font-bold uppercase tracking-[0.08em] lg:tracking-[0.15em] rounded-lg lg:rounded-xl hover:bg-espresso transition-colors duration-200 mb-2"
+      >
+        Buy Now
+      </button>
+
+      {/* Name + Price */}
+      <Link href={`/shop/${slug}`} className="font-sans text-[11px] lg:text-[15px] text-espresso font-medium hover:text-walnut transition-colors leading-snug line-clamp-2">
+        {name}
+      </Link>
+      <p className="text-walnut font-bold text-[11px] lg:text-[14px] mt-0.5">{formatPKR(price)}</p>
     </div>
   );
 }
