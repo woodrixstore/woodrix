@@ -26,7 +26,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     name: "Wooden Serving Tray",
     slug: "wooden-serving-tray",
     category: "Trays",
-    basePrice: 2500,
+    basePrice: 1199,
     description:
       "A beautifully handcrafted wooden serving tray — oil-finished for a warm, buttery surface. Perfect as a coffee table centrepiece, breakfast tray, or organiser. Made by skilled artisans in Karachi, Pakistan.",
     images: [
@@ -42,8 +42,8 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     badge: "Best Seller",
     variants: [
       { id: "d1v1", size: "Small (30cm)", finish: "Natural", priceModifier: 0, stock: 6 },
-      { id: "d1v2", size: "Medium (40cm)", finish: "Natural", priceModifier: 500, stock: 5 },
-      { id: "d1v3", size: "Large (50cm)", finish: "Natural", priceModifier: 1000, stock: 4 },
+      { id: "d1v2", size: "Medium (40cm)", finish: "Natural", priceModifier: 300, stock: 5 },
+      { id: "d1v3", size: "Large (50cm)", finish: "Natural", priceModifier: 600, stock: 4 },
     ],
   },
   {
@@ -51,11 +51,11 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     name: "Floating Mini Shelf",
     slug: "floating-mini-shelf",
     category: "Shelves",
-    basePrice: 1800,
+    basePrice: 1299,
     description:
       "A sleek floating mini shelf with concealed bracket system — holds up to 10 kg while sitting gracefully light on the wall. Ideal for books, plants, and décor. Available in natural and walnut finish.",
     images: [
-      "/products/floating-mini-shelf/mini-shelf-1.jpg",
+      "/products/floating-mini-shelf/mini-shelf-4.jpg",
       "/products/floating-mini-shelf/mini-shelf-2.webp",
       "/products/floating-mini-shelf/mini-shelf-3.jpg",
       "/products/floating-mini-shelf/mini-shelf-4.jpg",
@@ -78,7 +78,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     name: "Floating Book Shelf",
     slug: "floating-book-shelf",
     category: "Shelves",
-    basePrice: 3200,
+    basePrice: 1599,
     description:
       "A solid wood floating bookshelf — spacious enough for your favourite reads, elegant enough to anchor any room. Concealed mounting hardware included. Handcrafted in Karachi.",
     images: [
@@ -92,8 +92,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     badge: "New Arrival",
     variants: [
       { id: "d3v1", size: "80cm", finish: "Natural", priceModifier: 0, stock: 4 },
-      { id: "d3v2", size: "100cm", finish: "Natural", priceModifier: 600, stock: 3 },
-      { id: "d3v3", size: "80cm", finish: "Walnut Stain", priceModifier: 500, stock: 3 },
+      { id: "d3v2", size: "100cm", finish: "Natural", priceModifier: 400, stock: 3 },
     ],
   },
   {
@@ -101,7 +100,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     name: "Wooden Footrest",
     slug: "wooden-footrest",
     category: "Furniture",
-    basePrice: 3500,
+    basePrice: 1449,
     description:
       "A handcrafted wooden footrest with tapered legs and an oil-finished top — strong, warm and beautifully simple. Equally at home beside the sofa or at the foot of the bed. Built to last a lifetime.",
     images: [
@@ -113,8 +112,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     totalStock: 8,
     isFeatured: true,
     variants: [
-      { id: "d4v1", size: "Standard", finish: "Natural", priceModifier: 0, stock: 4 },
-      { id: "d4v2", size: "Standard", finish: "Walnut Stain", priceModifier: 500, stock: 4 },
+      { id: "d4v1", size: "Standard", finish: "Natural", priceModifier: 0, stock: 8 },
     ],
   },
   {
@@ -122,7 +120,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     name: "Wooden Key Holder",
     slug: "wooden-key-holder",
     category: "Decor",
-    basePrice: 1200,
+    basePrice: 799,
     description:
       "A minimalist wall-mounted wooden key holder — neatly organises your keys, bags and small accessories at the entrance. Hand-finished with smooth rounded hooks. A small detail that makes every home feel considered.",
     images: [
@@ -136,8 +134,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     badge: "Popular",
     variants: [
       { id: "d5v1", size: "3 Hooks", finish: "Natural", priceModifier: 0, stock: 10 },
-      { id: "d5v2", size: "5 Hooks", finish: "Natural", priceModifier: 300, stock: 8 },
-      { id: "d5v3", size: "3 Hooks", finish: "Walnut Stain", priceModifier: 200, stock: 7 },
+      { id: "d5v2", size: "5 Hooks", finish: "Natural", priceModifier: 200, stock: 8 },
     ],
   },
   {
@@ -145,7 +142,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     name: "Floating Laptop Table",
     slug: "floating-laptop-table",
     category: "Furniture",
-    basePrice: 4500,
+    basePrice: 2799,
     description:
       "A wall-mounted floating laptop table — folds flat when not in use, unfolds into a clean, sturdy work surface in seconds. Perfect for home offices, study corners, or small apartments. Space-saving, handcrafted, built to last.",
     images: [
@@ -160,8 +157,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     badge: "Space Saver",
     variants: [
       { id: "d6v1", size: "60×40cm", finish: "Natural", priceModifier: 0, stock: 5 },
-      { id: "d6v2", size: "80×40cm", finish: "Natural", priceModifier: 800, stock: 4 },
-      { id: "d6v3", size: "60×40cm", finish: "Walnut Stain", priceModifier: 500, stock: 3 },
+      { id: "d6v2", size: "80×40cm", finish: "Natural", priceModifier: 500, stock: 4 },
     ],
   },
 ];

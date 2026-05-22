@@ -18,12 +18,12 @@ export type FeaturedItem = {
 };
 
 const FALLBACK: FeaturedItem[] = [
-  { id: "demo-1", name: "Wooden Serving Tray", slug: "wooden-serving-tray", price: 2500, image: "/products/wooden-tray/tray-1.png", badge: "Best Seller" },
-  { id: "demo-2", name: "Floating Mini Shelf", slug: "floating-mini-shelf", price: 1800, image: "/products/floating-mini-shelf/mini-shelf-1.jpg" },
-  { id: "demo-3", name: "Floating Book Shelf", slug: "floating-book-shelf", price: 3200, image: "/products/floating-book-shelf/book-shelf-1.png", badge: "New Arrival" },
-  { id: "demo-4", name: "Wooden Footrest", slug: "wooden-footrest", price: 3500, image: "/products/wooden-footrest/footrest-1.png" },
-  { id: "demo-5", name: "Wooden Key Holder", slug: "wooden-key-holder", price: 1200, image: "/products/wooden-key-holder/key-holder-1.png", badge: "Popular" },
-  { id: "demo-6", name: "Floating Laptop Table", slug: "floating-laptop-table", price: 4500, image: "/products/floating-laptop-table/laptop-table-3.jpeg", badge: "Space Saver" },
+  { id: "demo-1", name: "Wooden Serving Tray", slug: "wooden-serving-tray", price: 1199, image: "/products/wooden-tray/tray-1.png", badge: "Best Seller" },
+  { id: "demo-2", name: "Floating Mini Shelf", slug: "floating-mini-shelf", price: 1299, image: "/products/floating-mini-shelf/mini-shelf-4.jpg" },
+  { id: "demo-3", name: "Floating Book Shelf", slug: "floating-book-shelf", price: 1599, image: "/products/floating-book-shelf/book-shelf-1.png", badge: "New Arrival" },
+  { id: "demo-4", name: "Wooden Footrest", slug: "wooden-footrest", price: 1449, image: "/products/wooden-footrest/footrest-1.png" },
+  { id: "demo-5", name: "Wooden Key Holder", slug: "wooden-key-holder", price: 799, image: "/products/wooden-key-holder/key-holder-1.png", badge: "Popular" },
+  { id: "demo-6", name: "Floating Laptop Table", slug: "floating-laptop-table", price: 2799, image: "/products/floating-laptop-table/laptop-table-3.jpeg", badge: "Space Saver" },
 ];
 
 function ProductCard({ item }: { item: FeaturedItem }) {

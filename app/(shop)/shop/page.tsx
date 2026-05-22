@@ -53,8 +53,8 @@ export default async function ShopPage({ searchParams }: { searchParams: SP }) {
   }));
 
   return (
-    <div className="container py-12">
-      <div className="mb-8">
+    <div className="container pt-4 pb-12">
+      <div className="mb-6">
         <p className="text-xs uppercase tracking-[0.3em] text-accent mb-2">Collection</p>
         <h1 className="font-serif text-4xl lg:text-5xl text-espresso">All Products</h1>
         <p className="text-muted-foreground mt-2">{displayProducts.length} pieces handcrafted with care</p>

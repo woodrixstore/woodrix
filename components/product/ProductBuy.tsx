@@ -1,7 +1,8 @@
 "use client";
 import { useMemo, useState } from "react";
-import { Minus, Plus, Heart, ShoppingBag } from "lucide-react";
+import { Minus, Plus, Heart, ShoppingBag, Zap } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import { formatPKR } from "@/lib/formatters";
@@ -52,6 +53,7 @@ export function ProductBuy({ product, variants }: Props) {
   const price = product.basePrice + (selected?.priceModifier ?? 0);
   const stock = selected?.stock ?? product.totalStock;
 
+  const router = useRouter();
   const addItem = useCart((s) => s.addItem);
   const openCart = useCart((s) => s.open);
   const toggleWish = useWishlist((s) => s.toggle);
@@ -79,8 +81,8 @@ export function ProductBuy({ product, variants }: Props) {
       {/* Price */}
       <p className="font-display text-[40px] text-espresso tabular-nums leading-none">{formatPKR(price)}</p>
 
-      {/* Finish / Color */}
-      {finishes.length > 0 && (
+      {/* Finish / Color — only show when multiple finishes exist */}
+      {finishes.length > 1 && (
         <div>
           <p className="text-[12px] uppercase tracking-[0.28em] text-warmgrey mb-3">
             Finish <span className="text-walnut font-medium">· {finish}</span>
@@ -165,7 +167,7 @@ export function ProductBuy({ product, variants }: Props) {
         <button
           onClick={add}
           disabled={stock <= 0}
-          className="flex-1 flex items-center justify-center gap-2 bg-espresso text-background py-4 rounded-xl text-[14px] font-medium tracking-wide hover:bg-walnut transition-colors duration-300 disabled:opacity-50 disabled:pointer-events-none"
+          className="flex-1 flex items-center justify-center gap-2 border-2 border-espresso text-espresso py-4 rounded-xl text-[14px] font-medium tracking-wide hover:bg-espresso hover:text-background transition-colors duration-300 disabled:opacity-50 disabled:pointer-events-none"
         >
           <ShoppingBag className="h-4 w-4" />
           Add to Cart
@@ -184,6 +186,30 @@ export function ProductBuy({ product, variants }: Props) {
           <Heart className={cn("h-5 w-5", isWished ? "fill-walnut text-walnut" : "text-espresso")} />
         </button>
       </div>
+
+      {/* Buy Now */}
+      <button
+        onClick={() => {
+          addItem({
+            id: `${product.id}-${selected?.id ?? "base"}-${Date.now()}`,
+            productId: product.id,
+            variantId: selected?.id ?? null,
+            name: product.name,
+            slug: product.slug,
+            image: product.images[0],
+            price,
+            quantity: qty,
+            size,
+            finish,
+          });
+          router.push("/checkout");
+        }}
+        disabled={stock <= 0}
+        className="w-full flex items-center justify-center gap-2 bg-walnut text-background py-4 rounded-xl text-[14px] font-bold tracking-wide hover:bg-espresso transition-colors duration-300 disabled:opacity-50 disabled:pointer-events-none"
+      >
+        <Zap className="h-4 w-4" />
+        Buy Now
+      </button>
 
       <p className="text-[12px] text-warmgrey flex items-center gap-2">
         <span>🚚</span> Free delivery on orders over PKR 3,000
