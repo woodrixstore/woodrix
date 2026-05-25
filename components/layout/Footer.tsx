@@ -101,8 +101,8 @@ export function Footer() {
         </div>
 
         {/* Mega wordmark */}
-        <div className="container pb-8">
-          <h2 className="font-display text-[26vw] sm:text-[22vw] lg:text-[18vw] leading-[0.85] tracking-tight text-walnut/15 text-center select-none">
+        <div className="container pb-8 overflow-hidden">
+          <h2 className="font-display text-[19vw] sm:text-[22vw] lg:text-[18vw] leading-[0.85] tracking-tight text-walnut/15 text-center select-none whitespace-nowrap">
             WOODRIX
           </h2>
           <p className="text-center text-[11px] uppercase tracking-[0.25em] text-warmgrey/70 mt-4">

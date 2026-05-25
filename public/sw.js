@@ -1,4 +1,4 @@
-const CACHE_NAME = "woodrix-v1";
+const CACHE_NAME = "woodrix-v2";
 const STATIC_ASSETS = [
   "/",
   "/shop",
