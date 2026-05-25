@@ -1,18 +1,11 @@
 export const dynamic = 'force-dynamic';
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Star, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { DEMO_PRODUCTS, getDemoProduct } from "@/lib/demo-products";
-import { ImageGallery } from "@/components/product/ImageGallery";
-import { ProductBuy } from "@/components/product/ProductBuy";
+import { ProductPageContent } from "@/components/product/ProductPageContent";
 import { ProductCard } from "@/components/shop/ProductCard";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const demo = getDemoProduct(params.slug);
@@ -53,6 +46,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
         description: demo.description,
         images: demo.images,
         totalStock: demo.totalStock,
+        finishImages: demo.finishImages,
         variants: demo.variants,
         reviews: [] as { rating: number; user: { name: string | null } | null; comment: string }[],
       }
@@ -65,6 +59,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
         description: dbProduct!.description,
         images: dbProduct!.images,
         totalStock: dbProduct!.totalStock,
+        finishImages: undefined as Record<string, string[]> | undefined,
         variants: dbProduct!.variants,
         reviews: dbProduct!.reviews,
       };
@@ -96,60 +91,21 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
       {/* Main product grid */}
       <div className="container max-w-[1400px] py-10">
-        <div className="grid lg:grid-cols-2 gap-14 items-start">
-          <ImageGallery images={product.images} name={product.name} />
-
-          <div className="lg:sticky lg:top-28">
-            {/* Brand + SKU */}
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] uppercase tracking-[0.32em] font-semibold text-walnut">Woodrix</span>
-              <span className="text-[11px] text-warmgrey">SKU: {product.id.slice(0, 8).toUpperCase()}</span>
-            </div>
-
-            <h1 className="font-display font-bold text-espresso leading-tight mb-3" style={{ fontSize: "clamp(26px, 3.5vw, 44px)" }}>
-              {product.name}
-            </h1>
-
-            {/* Rating */}
-            <div className="flex items-center gap-2 mb-6">
-              <div className="flex gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className={i < Math.round(avgRating) ? "h-4 w-4 fill-amber text-amber" : "h-4 w-4 text-walnut/20"} strokeWidth={1.4} />
-                ))}
-              </div>
-              <span className="text-[13px] text-warmgrey">{avgRating.toFixed(1)} · {product.reviews.length || 42} reviews</span>
-            </div>
-
-            <ProductBuy product={product} variants={product.variants} />
-
-            {/* Accordion details */}
-            <Accordion type="single" collapsible className="mt-10 border-t border-walnut/10">
-              <AccordionItem value="desc" className="border-walnut/10">
-                <AccordionTrigger className="text-[13px] uppercase tracking-[0.2em] text-espresso">Description</AccordionTrigger>
-                <AccordionContent className="text-[14px] text-warmgrey leading-relaxed">{product.description}</AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="spec" className="border-walnut/10">
-                <AccordionTrigger className="text-[13px] uppercase tracking-[0.2em] text-espresso">Dimensions & Materials</AccordionTrigger>
-                <AccordionContent>
-                  <table className="w-full text-[13px]">
-                    <tbody className="divide-y divide-walnut/10">
-                      <tr><td className="py-2.5 text-warmgrey">Material</td><td className="py-2.5 text-right text-espresso">Solid Wood</td></tr>
-                      <tr><td className="py-2.5 text-warmgrey">Finish</td><td className="py-2.5 text-right text-espresso">Hand-rubbed natural oil</td></tr>
-                      <tr><td className="py-2.5 text-warmgrey">Origin</td><td className="py-2.5 text-right text-espresso">Pakistan</td></tr>
-                      <tr><td className="py-2.5 text-warmgrey">Warranty</td><td className="py-2.5 text-right text-espresso">2 Years</td></tr>
-                    </tbody>
-                  </table>
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="shipping" className="border-walnut/10">
-                <AccordionTrigger className="text-[13px] uppercase tracking-[0.2em] text-espresso">Shipping & Returns</AccordionTrigger>
-                <AccordionContent className="text-[14px] text-warmgrey leading-relaxed">
-                  Standard delivery 5–7 business days. Free shipping over PKR 3,000. 7-day easy returns on unused items.
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </div>
-        </div>
+        <ProductPageContent
+          product={{
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            basePrice: product.basePrice,
+            description: product.description,
+            images: product.images,
+            totalStock: product.totalStock,
+            finishImages: product.finishImages,
+          }}
+          variants={product.variants}
+          avgRating={avgRating}
+          reviewCount={product.reviews.length || 42}
+        />
 
         {/* Related products */}
         {related.length > 0 && (

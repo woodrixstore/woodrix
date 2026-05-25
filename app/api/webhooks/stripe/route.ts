@@ -33,7 +33,12 @@ export async function POST(req: Request) {
       const shortId = order.id.slice(0, 8).toUpperCase();
       const { estimatedDelivery } = await import("@/lib/formatters");
       const eta = estimatedDelivery(order.shippingMethod, new Date(order.createdAt));
-      await sendOrderEmails(order, shortId, eta, "Debit / Credit Card").catch(() => {});
+      const emailItems = order.items.map((i: any) => ({
+        name: i.product?.name ?? "Product",
+        quantity: i.quantity,
+        priceAtPurchase: i.priceAtPurchase,
+      }));
+      await sendOrderEmails({ ...order, emailItems } as any, shortId, eta, "Debit / Credit Card").catch(() => {});
     }
   }
 

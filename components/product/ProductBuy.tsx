@@ -26,16 +26,20 @@ type Props = {
     totalStock: number;
   };
   variants: Variant[];
+  onFinishChange?: (finish: string) => void;
 };
 
 const FINISH_HEX: Record<string, string> = {
   Natural: "#D6B98A",
   Walnut: "#6B4226",
+  "Walnut Stain": "#6B4226",
   Ebony: "#2A1A12",
   "White Oak": "#E6D6BD",
+  White: "#F5F2EC",
+  Black: "#1C1C1C",
 };
 
-export function ProductBuy({ product, variants }: Props) {
+export function ProductBuy({ product, variants, onFinishChange }: Props) {
   const sizes = useMemo(
     () => Array.from(new Set(variants.map((v) => v.size))),
     [variants],
@@ -91,7 +95,7 @@ export function ProductBuy({ product, variants }: Props) {
             {finishes.map((f) => (
               <button
                 key={f}
-                onClick={() => setFinish(f)}
+                onClick={() => { setFinish(f); onFinishChange?.(f); }}
                 title={f}
                 className={cn(
                   "relative h-9 w-9 rounded-full border-2 transition-all duration-200",
@@ -110,8 +114,8 @@ export function ProductBuy({ product, variants }: Props) {
         </div>
       )}
 
-      {/* Size */}
-      {sizes.length > 0 && (
+      {/* Size — only show when more than one option */}
+      {sizes.length > 1 && (
         <div>
           <div className="flex items-center justify-between mb-3">
             <p className="text-[12px] uppercase tracking-[0.28em] text-warmgrey">

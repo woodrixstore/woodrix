@@ -17,6 +17,7 @@ export type DemoProduct = {
   totalStock: number;
   isFeatured: boolean;
   badge?: string;
+  finishImages?: Record<string, string[]>;
   variants: { id: string; size: string; finish: string; priceModifier: number; stock: number }[];
 };
 
@@ -41,9 +42,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     isFeatured: true,
     badge: "Best Seller",
     variants: [
-      { id: "d1v1", size: "Small (30cm)", finish: "Natural", priceModifier: 0, stock: 6 },
-      { id: "d1v2", size: "Medium (40cm)", finish: "Natural", priceModifier: 300, stock: 5 },
-      { id: "d1v3", size: "Large (50cm)", finish: "Natural", priceModifier: 600, stock: 4 },
+      { id: "d1v1", size: "Standard", finish: "Natural", priceModifier: 0, stock: 15 },
     ],
   },
   {
@@ -56,21 +55,26 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
       "A sleek floating mini shelf with concealed bracket system — holds up to 10 kg while sitting gracefully light on the wall. Ideal for books, plants, and décor. Available in natural and walnut finish.",
     images: [
       "/products/floating-mini-shelf/mini-shelf-4.jpg",
-      "/products/floating-mini-shelf/mini-shelf-2.webp",
-      "/products/floating-mini-shelf/mini-shelf-3.jpg",
-      "/products/floating-mini-shelf/mini-shelf-4.jpg",
-      "/products/floating-mini-shelf/mini-shelf-5.jpg",
-      "/products/floating-mini-shelf/mini-shelf-6.jpg",
       "/products/floating-mini-shelf/mini-shelf-7.jpg",
-      "/products/floating-mini-shelf/mini-shelf-8.jpg",
-      "/products/floating-mini-shelf/mini-shelf-9.jpg",
+      "/products/floating-mini-shelf/mini-shelf-6.jpg",
     ],
-    totalStock: 20,
+    totalStock: 18,
     isFeatured: true,
+    finishImages: {
+      White: [
+        "/products/floating-mini-shelf/mini-shelf-4.jpg",
+        "/products/floating-mini-shelf/mini-shelf-7.jpg",
+        "/products/floating-mini-shelf/mini-shelf-6.jpg",
+      ],
+      Black: [
+        "/products/floating-mini-shelf/mini-shelf-8.jpg",
+        "/products/floating-mini-shelf/mini-shelf-9.jpg",
+        "/products/floating-mini-shelf/mini-shelf-5.jpg",
+      ],
+    },
     variants: [
-      { id: "d2v1", size: "40cm", finish: "Natural", priceModifier: 0, stock: 8 },
-      { id: "d2v2", size: "60cm", finish: "Natural", priceModifier: 400, stock: 7 },
-      { id: "d2v3", size: "40cm", finish: "Walnut Stain", priceModifier: 300, stock: 5 },
+      { id: "d2v1", size: "Standard", finish: "White", priceModifier: 0, stock: 10 },
+      { id: "d2v2", size: "Standard", finish: "Black", priceModifier: 200, stock: 8 },
     ],
   },
   {
@@ -91,8 +95,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     isFeatured: true,
     badge: "New Arrival",
     variants: [
-      { id: "d3v1", size: "80cm", finish: "Natural", priceModifier: 0, stock: 4 },
-      { id: "d3v2", size: "100cm", finish: "Natural", priceModifier: 400, stock: 3 },
+      { id: "d3v1", size: "Standard", finish: "Natural", priceModifier: 0, stock: 10 },
     ],
   },
   {
@@ -133,8 +136,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     isFeatured: true,
     badge: "Popular",
     variants: [
-      { id: "d5v1", size: "3 Hooks", finish: "Natural", priceModifier: 0, stock: 10 },
-      { id: "d5v2", size: "5 Hooks", finish: "Natural", priceModifier: 200, stock: 8 },
+      { id: "d5v1", size: "Standard", finish: "Natural", priceModifier: 0, stock: 25 },
     ],
   },
   {
@@ -156,8 +158,7 @@ export const DEMO_PRODUCTS: DemoProduct[] = [
     isFeatured: true,
     badge: "Space Saver",
     variants: [
-      { id: "d6v1", size: "60×40cm", finish: "Natural", priceModifier: 0, stock: 5 },
-      { id: "d6v2", size: "80×40cm", finish: "Natural", priceModifier: 500, stock: 4 },
+      { id: "d6v1", size: "Standard", finish: "Natural", priceModifier: 0, stock: 12 },
     ],
   },
 ];
